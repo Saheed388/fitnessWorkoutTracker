@@ -8,14 +8,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table( name = "exercises")
-public class Exercises {
+public class Exercise {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,7 +31,7 @@ public class Exercises {
 
     @ManyToOne
     @JoinColumn(name = "workout_id")
-    private Workouts workouts;
+    private Workout workouts;
 
 }
 

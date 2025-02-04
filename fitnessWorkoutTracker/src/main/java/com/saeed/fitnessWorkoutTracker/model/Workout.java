@@ -2,7 +2,6 @@ package com.saeed.fitnessWorkoutTracker.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -15,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "Workouts")
-public class Workouts {
+public class Workout {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,11 +38,11 @@ public class Workouts {
     @Getter
     @Setter
     @OneToMany(mappedBy = "workouts",cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    private List<Exercises> exercises = new ArrayList<>();
+    private List<Exercise> exercises = new ArrayList<>();
 
     @Getter
     @Setter
     @OneToMany(mappedBy = "workouts",cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    private List<WorkoutNotes> workoutNotes = new ArrayList<>();
+    private List<WorkoutNote> workoutNotes = new ArrayList<>();
 }
 

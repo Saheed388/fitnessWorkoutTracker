@@ -1,4 +1,4 @@
 package com.saeed.fitnessWorkoutTracker.service;
 
-public interface WorkoutNotesService {
+public interface WorkoutReportService {
 }

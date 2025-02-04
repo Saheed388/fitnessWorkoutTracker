@@ -1,6 +1,5 @@
 package com.saeed.fitnessWorkoutTracker.model;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,27 +7,28 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
-@Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "workout_report")
+@Entity
+@Table( name = "workout_notes")
 
-public class WorkoutReports {
-
+public class WorkoutNote {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long workoutReportsId;
+    private Long workoutNoteId;
 
-    private Long totalWorkouts;
-    private Long completedWorkouts;
-    private Double completionPercentage;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    @Lob
+    private String note;
 
+    private LocalDate createdAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
+    @JoinColumn(name = "workout_id")
+    private Workout workouts;
+
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 }

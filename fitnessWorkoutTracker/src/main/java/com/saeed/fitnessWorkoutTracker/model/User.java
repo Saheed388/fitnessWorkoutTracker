@@ -41,16 +41,16 @@ public class User {
     @OneToMany(mappedBy = "user",
             cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, // Added REMOVE
             orphanRemoval = true)
-    private Set<Workouts> workouts;
+    private Set<Workout> workouts;
 
 
     @Getter
     @Setter
     @OneToMany(mappedBy = "user",cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    private List<WorkoutNotes> workoutNotes = new ArrayList<>();
+    private List<WorkoutNote> workoutNotes = new ArrayList<>();
 
     @Getter
     @Setter
     @OneToMany(mappedBy = "user",cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    private List<WorkoutReports> workoutReports = new ArrayList<>();
+    private List<WorkoutReport> workoutReports = new ArrayList<>();
 }
