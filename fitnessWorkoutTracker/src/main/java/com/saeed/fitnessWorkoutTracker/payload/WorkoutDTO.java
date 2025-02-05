@@ -7,13 +7,13 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class WorkoutNoteDTO {
-    private Long workoutNoteId;
+@AllArgsConstructor
 
-    private String note;
+public class WorkoutDTO {
 
-    private LocalDate createdAt;
-
+    private Long workoutId;
+    private String title;
+    private LocalDate scheduled_date;
+    private LocalDate created_at;
 }
