@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -27,7 +28,12 @@ public class Exercise {
     private Long setsExercises;
     private Long exercisesRepetitions;
     private Boolean completed;
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
+
+    @PrePersist // Automatically set the postDate when the entity is persisted
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
 
     @ManyToOne
     @JoinColumn(name = "workout_id")

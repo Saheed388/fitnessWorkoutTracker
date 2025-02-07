@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -16,5 +17,5 @@ public class ExerciseDTO {
     private Long setsExercises;
     private Long exercisesRepetitions;
     private Boolean completed;
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 }
