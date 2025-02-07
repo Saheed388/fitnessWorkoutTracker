@@ -19,7 +19,7 @@ public class Exercise {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long exercisesId;
+    private Long exerciseId;
 
     @NotBlank
     @Size(min = 5, message = "Category  must contain atleast 5 characters")

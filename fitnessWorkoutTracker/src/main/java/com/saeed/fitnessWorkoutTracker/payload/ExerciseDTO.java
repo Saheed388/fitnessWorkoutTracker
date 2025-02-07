@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 
 public class ExerciseDTO {
-    private Long exercisesId;
+    private Long exerciseId;
     private String exerciseName;
     private Long setsExercises;
     private Long exercisesRepetitions;
