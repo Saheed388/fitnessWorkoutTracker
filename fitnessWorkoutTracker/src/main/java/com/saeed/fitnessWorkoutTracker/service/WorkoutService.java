@@ -12,4 +12,6 @@ public interface WorkoutService {
     WorkoutDTO getContentById(Long workoutId);
 
     WorkoutDTO deleteWorkout(Long workoutId);
+
+    WorkoutDTO updateCategory(@Valid WorkoutDTO workoutDTO, Long workoutId);
 }

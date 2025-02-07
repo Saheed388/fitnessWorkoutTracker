@@ -1,7 +1,6 @@
 package com.saeed.fitnessWorkoutTracker.controller;
 
 import com.saeed.fitnessWorkoutTracker.config.AppConstants;
-import com.saeed.fitnessWorkoutTracker.model.Workout;
 import com.saeed.fitnessWorkoutTracker.payload.WorkoutDTO;
 import com.saeed.fitnessWorkoutTracker.payload.WorkoutResponse;
 import com.saeed.fitnessWorkoutTracker.service.WorkoutService;
@@ -13,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
-public class workoutController {
+public class WorkoutController {
 
     @Autowired
     WorkoutService workoutService;
@@ -48,6 +47,13 @@ public class workoutController {
 
         WorkoutDTO deleteWorkout = workoutService.deleteWorkout(workoutId);
         return new ResponseEntity<>(deleteWorkout, HttpStatus.OK);
+    }
+
+    @PutMapping("/workouts/{workoutId}")
+    public ResponseEntity<WorkoutDTO> updateCategory(@Valid @RequestBody WorkoutDTO workoutDTO,
+                                                      @PathVariable Long workoutId){
+        WorkoutDTO savedWorkoutDTO = workoutService.updateCategory(workoutDTO, workoutId);
+        return new ResponseEntity<>(savedWorkoutDTO, HttpStatus.OK);
     }
 
 

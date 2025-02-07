@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -28,11 +29,11 @@ public class Workout {
     private String title;
 
     private LocalDate scheduled_date;
-    private LocalDate created_at;
+    private LocalDateTime created_at;
 
     @PrePersist // Automatically set the postDate when the entity is persisted
     protected void onCreate() {
-        created_at = LocalDate.now();
+        created_at = LocalDateTime.now();
     }
 
 

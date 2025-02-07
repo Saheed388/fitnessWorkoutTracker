@@ -80,5 +80,16 @@ public class WorkoutServiceImpl implements WorkoutService {
         return modelMapper.map(workout, WorkoutDTO.class);
 
     }
+
+    @Override
+    public WorkoutDTO updateCategory(WorkoutDTO workoutDTO, Long workoutId) {
+        Workout savedWorkout = workoutRepository.findById(workoutId)
+                .orElseThrow(() -> new ResourceNotFoundException("Workout", "workoutId", workoutId));
+        savedWorkout.setTitle(workoutDTO.getTitle());
+        savedWorkout.setScheduled_date(workoutDTO.getScheduled_date());
+        Workout updatedWorkout = workoutRepository.save(savedWorkout);
+
+        return modelMapper.map(updatedWorkout, WorkoutDTO.class);
+    }
 }
 
