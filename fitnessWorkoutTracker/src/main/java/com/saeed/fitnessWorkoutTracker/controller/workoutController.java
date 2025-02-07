@@ -34,5 +34,23 @@ public class workoutController {
         return new ResponseEntity<>(savedWorkoutDTO, HttpStatus.CREATED);
     }
 
+    @GetMapping("/workouts/{workoutId}")
+    public ResponseEntity<WorkoutDTO> getWorkoutById(@PathVariable Long workoutId){
+        WorkoutDTO workoutDTO = workoutService.getContentById(workoutId);
+        if (workoutDTO != null)
+            return new ResponseEntity<>(workoutDTO, HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+    }
+
+    @DeleteMapping("/workouts/{workoutId}")
+    public ResponseEntity<WorkoutDTO> deleteWorkout(@PathVariable Long workoutId){
+
+        WorkoutDTO deleteWorkout = workoutService.deleteWorkout(workoutId);
+        return new ResponseEntity<>(deleteWorkout, HttpStatus.OK);
+    }
+
+
+
 }
 

@@ -18,9 +18,9 @@ import java.util.UUID;
 public class Workout {
 
     @Id
-    @GeneratedValue(generator = "UUID")
-    @Column(updatable = false, nullable = false, unique = true)
-    private UUID workoutId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @Column(updatable = false, nullable = false, unique = true)
+    private Long workoutId;
 
 
     @NotBlank

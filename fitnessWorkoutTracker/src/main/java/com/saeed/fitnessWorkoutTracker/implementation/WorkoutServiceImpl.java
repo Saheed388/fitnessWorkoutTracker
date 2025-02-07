@@ -1,6 +1,7 @@
 package com.saeed.fitnessWorkoutTracker.implementation;
 
 import com.saeed.fitnessWorkoutTracker.exception.APIException;
+import com.saeed.fitnessWorkoutTracker.exception.ResourceNotFoundException;
 import com.saeed.fitnessWorkoutTracker.model.Workout;
 import com.saeed.fitnessWorkoutTracker.payload.WorkoutDTO;
 import com.saeed.fitnessWorkoutTracker.payload.WorkoutResponse;
@@ -62,6 +63,22 @@ public class WorkoutServiceImpl implements WorkoutService {
             throw new APIException("Category with the name " + workout.getTitle() + " already exists !!!");
         Workout savedWorkout = workoutRepository.save(workout);
         return modelMapper.map(savedWorkout, WorkoutDTO.class);
+    }
+
+    @Override
+    public WorkoutDTO getContentById(Long workoutId) {
+        return workoutRepository.findById(workoutId)
+                .map(workout -> modelMapper.map(workout, WorkoutDTO.class))
+                .orElseThrow(()-> new ResourceNotFoundException("Workout", "workoutId", workoutId));
+    }
+
+    @Override
+    public WorkoutDTO deleteWorkout(Long workoutId) {
+        Workout workout = workoutRepository.findById(workoutId)
+                .orElseThrow(()-> new ResourceNotFoundException( "Workout", "workoutId", workoutId));
+        workoutRepository.delete(workout);
+        return modelMapper.map(workout, WorkoutDTO.class);
+
     }
 }
 
