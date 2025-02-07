@@ -8,6 +8,7 @@ import lombok.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Data
@@ -17,8 +18,9 @@ import java.util.List;
 public class Workout {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long workoutId;
+    @GeneratedValue(generator = "UUID")
+    @Column(updatable = false, nullable = false, unique = true)
+    private UUID workoutId;
 
 
     @NotBlank
@@ -28,11 +30,16 @@ public class Workout {
     private LocalDate scheduled_date;
     private LocalDate created_at;
 
+    @PrePersist // Automatically set the postDate when the entity is persisted
+    protected void onCreate() {
+        created_at = LocalDate.now();
+    }
 
 
-    @ManyToOne
-    @JoinColumn(name = "userId") // Changed to match User entity's primary key
-    private User user;
+
+//    @ManyToOne
+//    @JoinColumn(name = "userId") // Changed to match User entity's primary key
+//    private User user;
 
 
     @Getter
@@ -44,5 +51,8 @@ public class Workout {
     @Setter
     @OneToMany(mappedBy = "workouts",cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private List<WorkoutNote> workoutNotes = new ArrayList<>();
+
+
+
 }
 

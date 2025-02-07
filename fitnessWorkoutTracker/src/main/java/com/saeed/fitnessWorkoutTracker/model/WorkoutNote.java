@@ -30,9 +30,9 @@ public class WorkoutNote {
     @JoinColumn(name = "workout_id")
     private Workout workouts;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+//    @ManyToOne
+//    @JoinColumn(name = "user_id")
+//    private User user;
 }
 
 
