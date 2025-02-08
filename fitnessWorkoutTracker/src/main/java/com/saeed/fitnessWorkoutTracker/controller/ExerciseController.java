@@ -34,5 +34,27 @@ public class ExerciseController {
         ExerciseResponse exerciseResponse = exerciseService.getAllProducts(pageNumber, pageSize, sortBy, sortOrder);
         return new ResponseEntity<>(exerciseResponse,HttpStatus.OK);
     }
+    @GetMapping("/workout/{workoutId}/exercises")
+    public ResponseEntity<ExerciseResponse> getExerciseByWorkout(@PathVariable Long workoutId,
+                                                                 @RequestParam(name = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+                                                                 @RequestParam(name = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
+                                                                 @RequestParam(name = "sortBy", defaultValue = AppConstants.SORT_EXERCISES_BY, required = false) String sortBy,
+                                                                 @RequestParam(name = "sortOrder", defaultValue = AppConstants.SORT_DIR, required = false) String sortOrder){
+        ExerciseResponse productResponse = exerciseService.searchByWorkout(workoutId, pageNumber, pageSize, sortBy, sortOrder);
+        return new ResponseEntity<>(productResponse, HttpStatus.OK);
+    }
+
+    @PutMapping("/exercises/{exerciseId}")
+    public ResponseEntity<ExerciseDTO> updateExercise(@Valid @RequestBody ExerciseDTO exerciseDTO,
+                                                    @PathVariable Long exerciseId){
+        ExerciseDTO updatedExerciseDTO = exerciseService.updateExercise(exerciseId, exerciseDTO);
+        return new ResponseEntity<>(updatedExerciseDTO, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/exercises/{exerciseId}")
+    public ResponseEntity<ExerciseDTO> deleteExercise(@PathVariable Long exerciseId){
+        ExerciseDTO deletedExercise = exerciseService.deleteExercise(exerciseId);
+        return new ResponseEntity<>(deletedExercise, HttpStatus.OK);
+    }
 }
 

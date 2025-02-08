@@ -45,12 +45,12 @@ public class Workout {
 
     @Getter
     @Setter
-    @OneToMany(mappedBy = "workouts",cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    @OneToMany(mappedBy = "workout",cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private List<Exercise> exercises = new ArrayList<>();
 
     @Getter
     @Setter
-    @OneToMany(mappedBy = "workouts",cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    @OneToMany(mappedBy = "workout",cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private List<WorkoutNote> workoutNotes = new ArrayList<>();
 
 

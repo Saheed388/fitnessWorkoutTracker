@@ -37,7 +37,7 @@ public class Exercise {
 
     @ManyToOne
     @JoinColumn(name = "workout_id")
-    private Workout workouts;
+    private Workout workout;
 
 }
 

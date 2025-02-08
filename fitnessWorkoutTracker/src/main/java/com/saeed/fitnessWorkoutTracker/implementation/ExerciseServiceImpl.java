@@ -7,7 +7,6 @@ import com.saeed.fitnessWorkoutTracker.model.Workout;
 import com.saeed.fitnessWorkoutTracker.payload.ExerciseDTO;
 import com.saeed.fitnessWorkoutTracker.payload.ExerciseResponse;
 import com.saeed.fitnessWorkoutTracker.repository.ExerciseRepository;
-import com.saeed.fitnessWorkoutTracker.repository.WorkoutNoteRepository;
 import com.saeed.fitnessWorkoutTracker.repository.WorkoutRepository;
 import com.saeed.fitnessWorkoutTracker.service.ExerciseService;
 import org.modelmapper.ModelMapper;
@@ -33,30 +32,30 @@ public class ExerciseServiceImpl implements ExerciseService {
 
     @Override
     public ExerciseDTO addExercise(Long workoutId, ExerciseDTO exerciseDTO) {
-            Workout workout = workoutRepository.findById(workoutId)
-                    .orElseThrow(() ->
-                            new ResourceNotFoundException("Workout", "workoutId", workoutId));
+        Workout workout = workoutRepository.findById(workoutId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Workout", "workoutId", workoutId));
 
-            boolean isExerciseNotPresent = true;
+        boolean isExerciseNotPresent = true;
 
-            List<Exercise> exercises = workout.getExercises();
-            for (Exercise value : exercises) {
-                if (value.getExerciseName().equals(exerciseDTO.getExerciseName())) {
-                    isExerciseNotPresent = false;
-                    break;
-                }
-            }
-
-            if (isExerciseNotPresent) {
-                Exercise exercise = modelMapper.map(exerciseDTO, Exercise.class);
-                exercise.setWorkouts(workout);
-
-                Exercise savedExercise = exerciseRepository.save(exercise);
-                return modelMapper.map(savedExercise, ExerciseDTO.class);
-            } else {
-                throw new APIException("Product already exist!!");
+        List<Exercise> exercises = workout.getExercises();
+        for (Exercise value : exercises) {
+            if (value.getExerciseName().equals(exerciseDTO.getExerciseName())) {
+                isExerciseNotPresent = false;
+                break;
             }
         }
+
+        if (isExerciseNotPresent) {
+            Exercise exercise = modelMapper.map(exerciseDTO, Exercise.class);
+            exercise.setWorkout(workout);
+
+            Exercise savedExercise = exerciseRepository.save(exercise);
+            return modelMapper.map(savedExercise, ExerciseDTO.class);
+        } else {
+            throw new APIException("Product already exist!!");
+        }
+    }
 
     @Override
     public ExerciseResponse getAllProducts(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
@@ -82,6 +81,72 @@ public class ExerciseServiceImpl implements ExerciseService {
         exerciseResponse.setLastPage(pageExercises.isLast());
         return exerciseResponse;
     }
+
+    @Override
+    public ExerciseResponse searchByWorkout(Long workoutId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+
+        Workout workout = workoutRepository.findById(workoutId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Workout", "workoutId", workoutId));
+
+        Sort sortByAndOrder = sortOrder.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
+        Page<Exercise> pageExercises = exerciseRepository.findByWorkoutOrderByExercisesRepetitionsAsc(workout, pageDetails);
+
+        List<Exercise> exercises = pageExercises.getContent();
+
+        if (exercises.isEmpty()) {
+            throw new APIException(workout.getTitle() + " workout does not have any exercise");
+        }
+
+        List<ExerciseDTO> exerciseDTOS = exercises.stream()
+                .map(exercise -> modelMapper.map(exercise, ExerciseDTO.class))
+                .toList();
+
+        ExerciseResponse exerciseResponse = new ExerciseResponse();
+        exerciseResponse.setExerciseDTOS(exerciseDTOS);
+        exerciseResponse.setPageNumber(pageExercises.getNumber());
+        exerciseResponse.setPageSize(pageExercises.getSize());
+        exerciseResponse.setTotalElements(pageExercises.getTotalElements());
+        exerciseResponse.setTotalPages(pageExercises.getTotalPages());
+        exerciseResponse.setLastPage(pageExercises.isLast());
+        return exerciseResponse;
     }
+
+    @Override
+    public ExerciseDTO updateExercise(Long exerciseId, ExerciseDTO exerciseDTO) {
+        Exercise exerciseFromDb = exerciseRepository.findById(exerciseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Exercise", "exerciseId", exerciseId));
+
+        // Update only the necessary fields
+        exerciseFromDb.setExerciseName(exerciseDTO.getExerciseName());
+        exerciseFromDb.setSetsExercises(exerciseDTO.getSetsExercises());
+        exerciseFromDb.setExercisesRepetitions(exerciseDTO.getExercisesRepetitions());
+        exerciseFromDb.setCompleted(exerciseDTO.getCompleted());
+
+        // Save updated entity
+        Exercise savedExercise = exerciseRepository.save(exerciseFromDb);
+
+        // Return the updated DTO
+        return modelMapper.map(savedExercise, ExerciseDTO.class);
+    }
+
+    @Override
+    public ExerciseDTO deleteExercise(Long exerciseId) {
+
+        Exercise exercise = exerciseRepository.findById(exerciseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Exercise", "exerciseId", exerciseId));
+
+        exerciseRepository.delete(exercise);
+        return modelMapper.map(exercise, ExerciseDTO.class);
+    }
+    }
+
+
+
+
 
 
