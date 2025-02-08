@@ -1,6 +1,7 @@
 package com.saeed.fitnessWorkoutTracker.implementation;
 
 import com.saeed.fitnessWorkoutTracker.exception.APIException;
+import com.saeed.fitnessWorkoutTracker.exception.ApiResponse;
 import com.saeed.fitnessWorkoutTracker.exception.ResourceNotFoundException;
 import com.saeed.fitnessWorkoutTracker.model.Exercise;
 import com.saeed.fitnessWorkoutTracker.model.Workout;
@@ -30,6 +31,8 @@ public class ExerciseServiceImpl implements ExerciseService {
     @Autowired
     WorkoutRepository workoutRepository;
 
+
+
     @Override
     public ExerciseDTO addExercise(Long workoutId, ExerciseDTO exerciseDTO) {
         Workout workout = workoutRepository.findById(workoutId)
@@ -57,8 +60,11 @@ public class ExerciseServiceImpl implements ExerciseService {
         }
     }
 
+
+
+
     @Override
-    public ExerciseResponse getAllProducts(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+    public ApiResponse<ExerciseResponse> getAllExercises(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
         Sort sortByAndOrder = sortOrder.equalsIgnoreCase("asc")
                 ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
@@ -79,8 +85,10 @@ public class ExerciseServiceImpl implements ExerciseService {
         exerciseResponse.setTotalElements(pageExercises.getTotalElements());
         exerciseResponse.setTotalPages(pageExercises.getTotalPages());
         exerciseResponse.setLastPage(pageExercises.isLast());
-        return exerciseResponse;
+
+        return new ApiResponse<>("Successfully retrieved all exercises ", exerciseResponse);
     }
+
 
     @Override
     public ExerciseResponse searchByWorkout(Long workoutId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
@@ -121,18 +129,17 @@ public class ExerciseServiceImpl implements ExerciseService {
         Exercise exerciseFromDb = exerciseRepository.findById(exerciseId)
                 .orElseThrow(() -> new ResourceNotFoundException("Exercise", "exerciseId", exerciseId));
 
-        // Update only the necessary fields
         exerciseFromDb.setExerciseName(exerciseDTO.getExerciseName());
         exerciseFromDb.setSetsExercises(exerciseDTO.getSetsExercises());
         exerciseFromDb.setExercisesRepetitions(exerciseDTO.getExercisesRepetitions());
         exerciseFromDb.setCompleted(exerciseDTO.getCompleted());
+        exerciseFromDb.setCreatedAt(exerciseDTO.getCreatedAt());
 
-        // Save updated entity
         Exercise savedExercise = exerciseRepository.save(exerciseFromDb);
 
-        // Return the updated DTO
-        return modelMapper.map(savedExercise, ExerciseDTO.class);
+        return new ApiResponse<>("Updated Successfully", modelMapper.map(savedExercise, ExerciseDTO.class)).getData();
     }
+
 
     @Override
     public ExerciseDTO deleteExercise(Long exerciseId) {
@@ -142,8 +149,11 @@ public class ExerciseServiceImpl implements ExerciseService {
 
         exerciseRepository.delete(exercise);
         return modelMapper.map(exercise, ExerciseDTO.class);
+
     }
-    }
+
+
+}
 
 
 
