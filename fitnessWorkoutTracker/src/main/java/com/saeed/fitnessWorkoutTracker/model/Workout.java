@@ -38,9 +38,9 @@ public class Workout {
 
 
 
-//    @ManyToOne
-//    @JoinColumn(name = "userId") // Changed to match User entity's primary key
-//    private User user;
+    @ManyToOne
+    @JoinColumn(name = "userId") // Changed to match User entity's primary key
+    private User user;
 
 
     @Getter

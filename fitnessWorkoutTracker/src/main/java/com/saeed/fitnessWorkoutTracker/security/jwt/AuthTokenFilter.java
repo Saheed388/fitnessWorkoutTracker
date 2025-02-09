@@ -1,6 +1,6 @@
 package com.saeed.fitnessWorkoutTracker.security.jwt;
 
-import com.ecommerce.project.security.services.UserDetailsServiceImpl;
+import com.saeed.fitnessWorkoutTracker.security.service.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

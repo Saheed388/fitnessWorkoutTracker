@@ -36,10 +36,10 @@ public class WorkoutNote {
     @ManyToOne
     @JoinColumn(name = "workout_id")
     private Workout workout;
-//
-//    @ManyToOne
-//    @JoinColumn(name = "user_id")
-//    private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 }
 
 
