@@ -4,6 +4,7 @@ import com.saeed.fitnessWorkoutTracker.config.AppConstants;
 import com.saeed.fitnessWorkoutTracker.exception.ApiResponse;
 import com.saeed.fitnessWorkoutTracker.payload.ExerciseDTO;
 import com.saeed.fitnessWorkoutTracker.payload.ExerciseResponse;
+import com.saeed.fitnessWorkoutTracker.payload.WorkoutDTO;
 import com.saeed.fitnessWorkoutTracker.service.ExerciseService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +26,7 @@ public class ExerciseController {
                                                   @PathVariable Long workoutId){
         ExerciseDTO savedExerciseDTO= exerciseService.addExercise(workoutId, exerciseDTO);
         return new ResponseEntity<>(new ApiResponse<>("added successfully", savedExerciseDTO), HttpStatus.OK);
-
-
     }
-
 
 
     @GetMapping("/exercises")
@@ -61,6 +59,15 @@ public class ExerciseController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @GetMapping("/exercises/{exerciseId}")
+    public ResponseEntity<ApiResponse<ExerciseDTO>> getExerciseById(@PathVariable Long exerciseId){
+        ExerciseDTO exerciseDTO = exerciseService.getExerciseById(exerciseId);
+        if (exerciseDTO != null)
+            return new ResponseEntity<>(new ApiResponse<>("Successfully retrieved exercise by exerciseId ", exerciseDTO), HttpStatus.OK);
+
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+    }
 
     @PutMapping("/exercises/{exerciseId}")
     public ResponseEntity<ApiResponse<ExerciseDTO>> updateExercise(@Valid @RequestBody ExerciseDTO exerciseDTO,

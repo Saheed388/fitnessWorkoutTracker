@@ -21,4 +21,6 @@ public interface ExerciseService {
     ExerciseDTO updateExercise(Long exerciseId, @Valid ExerciseDTO exerciseDTO);
 
     ApiResponse<ExerciseResponse> getAllExercises(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
+
+    ExerciseDTO getExerciseById(Long exerciseId);
 }

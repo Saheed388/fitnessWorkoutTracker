@@ -30,7 +30,7 @@ public class Exercise {
     private Boolean completed;
     private LocalDateTime createdAt;
 
-    @PrePersist // Automatically set the postDate when the entity is persisted
+    @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }

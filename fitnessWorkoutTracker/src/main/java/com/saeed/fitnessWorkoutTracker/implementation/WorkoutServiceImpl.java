@@ -21,11 +21,11 @@ import java.util.List;
 public class WorkoutServiceImpl implements WorkoutService {
 
     @Autowired
-    private WorkoutRepository workoutRepository;
+     WorkoutRepository workoutRepository;
 
 
     @Autowired
-    private ModelMapper modelMapper;
+     ModelMapper modelMapper;
 
     @Override
     public WorkoutResponse getAllWorkouts(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {

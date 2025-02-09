@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 
 @Data
@@ -24,12 +25,18 @@ public class WorkoutNote {
     @Lob
     private String note;
 
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate()
+    {
+        createdAt = LocalDateTime.now();
+    }
 
     @ManyToOne
     @JoinColumn(name = "workout_id")
     private Workout workout;
-
+//
 //    @ManyToOne
 //    @JoinColumn(name = "user_id")
 //    private User user;

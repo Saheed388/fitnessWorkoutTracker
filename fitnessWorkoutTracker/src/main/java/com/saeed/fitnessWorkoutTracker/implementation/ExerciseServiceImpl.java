@@ -7,6 +7,7 @@ import com.saeed.fitnessWorkoutTracker.model.Exercise;
 import com.saeed.fitnessWorkoutTracker.model.Workout;
 import com.saeed.fitnessWorkoutTracker.payload.ExerciseDTO;
 import com.saeed.fitnessWorkoutTracker.payload.ExerciseResponse;
+import com.saeed.fitnessWorkoutTracker.payload.WorkoutDTO;
 import com.saeed.fitnessWorkoutTracker.repository.ExerciseRepository;
 import com.saeed.fitnessWorkoutTracker.repository.WorkoutRepository;
 import com.saeed.fitnessWorkoutTracker.service.ExerciseService;
@@ -24,7 +25,7 @@ import java.util.List;
 public class ExerciseServiceImpl implements ExerciseService {
 
     @Autowired
-    private ModelMapper modelMapper;
+     ModelMapper modelMapper;
     @Autowired
     ExerciseRepository exerciseRepository;
 
@@ -87,6 +88,13 @@ public class ExerciseServiceImpl implements ExerciseService {
         exerciseResponse.setLastPage(pageExercises.isLast());
 
         return new ApiResponse<>("Successfully retrieved all exercises ", exerciseResponse);
+    }
+
+    @Override
+    public ExerciseDTO getExerciseById(Long exerciseId) {
+        return exerciseRepository.findById(exerciseId)
+                .map(exercise -> modelMapper.map(exercise, ExerciseDTO.class))
+                .orElseThrow(()-> new ResourceNotFoundException("Exercise", "exerciseId", exerciseId));
     }
 
 
