@@ -17,4 +17,6 @@ public interface WorkoutNoteService {
     WorkoutNoteDTO getWorkoutNoteById(Long workoutNoteId);
 
     WorkoutNoteDTO updateWorkoutNote(Long workoutNoteId, @Valid WorkoutNoteDTO workoutNoteDTO);
+
+    WorkoutNoteDTO deleteworkoutNote(Long workoutNoteId);
 }

@@ -20,7 +20,7 @@ public class WorkoutReport {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long workoutReportsId;
-
+    private String image;
     private Long totalWorkouts;
     private Long completedWorkouts;
     private Double completionPercentage;

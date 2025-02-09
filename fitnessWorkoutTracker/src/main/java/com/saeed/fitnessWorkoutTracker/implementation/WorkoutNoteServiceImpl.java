@@ -7,7 +7,6 @@ import com.saeed.fitnessWorkoutTracker.model.Exercise;
 import com.saeed.fitnessWorkoutTracker.model.Workout;
 import com.saeed.fitnessWorkoutTracker.model.WorkoutNote;
 import com.saeed.fitnessWorkoutTracker.payload.ExerciseDTO;
-import com.saeed.fitnessWorkoutTracker.payload.ExerciseResponse;
 import com.saeed.fitnessWorkoutTracker.payload.WorkoutNoteDTO;
 import com.saeed.fitnessWorkoutTracker.payload.WorkoutNoteResponse;
 import com.saeed.fitnessWorkoutTracker.repository.WorkoutNoteRepository;
@@ -143,6 +142,15 @@ public class WorkoutNoteServiceImpl implements WorkoutNoteService {
         WorkoutNote savedWorkoutNote = workoutNoteRepository.save(workoutNoteFromDb);
 
         return new ApiResponse<>("Updated Successfully", modelMapper.map(savedWorkoutNote, WorkoutNoteDTO.class)).getData();
+    }
+
+    @Override
+    public WorkoutNoteDTO deleteworkoutNote(Long workoutNoteId) {
+        WorkoutNote workoutNote = workoutNoteRepository.findById(workoutNoteId)
+                .orElseThrow(() -> new ResourceNotFoundException("WorkoutNote", "workoutNoteId", workoutNoteId));
+
+        workoutNoteRepository.delete(workoutNote);
+        return modelMapper.map(workoutNote, WorkoutNoteDTO.class);
     }
 }
 

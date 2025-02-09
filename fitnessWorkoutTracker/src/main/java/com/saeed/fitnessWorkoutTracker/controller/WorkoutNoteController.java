@@ -70,4 +70,10 @@ public class WorkoutNoteController {
         WorkoutNoteDTO updatedWorkoutNoteDTO = workoutNoteService.updateWorkoutNote(workoutNoteId, workoutNoteDTO);
         return new ResponseEntity<>(new ApiResponse<>("Updated Successfully", updatedWorkoutNoteDTO), HttpStatus.OK);
     }
+
+    @DeleteMapping("/workoutnote/{workoutNoteId}")
+    public ResponseEntity<ApiResponse<WorkoutNoteDTO>> deleteWorkoutNote(@PathVariable Long workoutNoteId){
+        WorkoutNoteDTO deletedWorkoutNoteDTO = workoutNoteService.deleteworkoutNote(workoutNoteId);
+        return new ResponseEntity<>(new ApiResponse<>("deleted successfully", deletedWorkoutNoteDTO), HttpStatus.OK);
+    }
 }
