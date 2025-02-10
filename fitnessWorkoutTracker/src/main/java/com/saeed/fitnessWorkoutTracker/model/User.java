@@ -74,4 +74,21 @@ public class User {
     public Set<Role> getRoles() {
         return roles;
     }
+
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
 }

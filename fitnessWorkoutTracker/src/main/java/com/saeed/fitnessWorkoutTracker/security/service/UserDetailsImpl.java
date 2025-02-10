@@ -3,9 +3,9 @@ package com.saeed.fitnessWorkoutTracker.security.service;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,7 +13,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.saeed.fitnessWorkoutTracker.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-@NoArgsConstructor
 @Data
 public class UserDetailsImpl implements UserDetails {
     private static final long serialVersionUID = 1L;
@@ -27,7 +26,7 @@ public class UserDetailsImpl implements UserDetails {
 
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserDetailsImpl(Long id, String username, String email, String password, 
+    public UserDetailsImpl(Long id, String username, String email, String password,
                            Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.username = username;
@@ -37,15 +36,15 @@ public class UserDetailsImpl implements UserDetails {
     }
 
     public static UserDetailsImpl build(User user) {
-        // Assign only a single fixed role: "USER_ROLE"
-        GrantedAuthority authority = new SimpleGrantedAuthority("USER_ROLE");
+        // Dynamically map user's role(s) instead of assigning a fixed role
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
 
         return new UserDetailsImpl(
                 user.getUserId(),
                 user.getUserName(),
                 user.getEmail(),
                 user.getPassword(),
-                List.of(authority) // Single role assigned
+                authorities
         );
     }
 

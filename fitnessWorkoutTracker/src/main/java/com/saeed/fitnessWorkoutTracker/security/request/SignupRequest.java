@@ -29,4 +29,21 @@ public class SignupRequest {
     public void setRole(Set<String> role) {
         this.role = role;
     }
+
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public CharSequence getPassword() {
+        return password;
+    }
 }

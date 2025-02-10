@@ -13,8 +13,8 @@ public class UserInfoResponse {
         this.jwtToken = jwtToken;
     }
 
-    public UserInfoResponse(Long id, String username, String jwtToken) {
-    }
+    // Remove the incorrect constructor
+    // public UserInfoResponse(Long id, String username, String jwtToken) { }
 
     public Long getId() {
         return id;

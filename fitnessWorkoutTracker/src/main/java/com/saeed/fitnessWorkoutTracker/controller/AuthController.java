@@ -31,10 +31,10 @@ import java.util.Map;
 public class AuthController {
 
     @Autowired
-    private JwtUtils jwtUtils;
+     JwtUtils jwtUtils;
 
     @Autowired
-    private AuthenticationManager authenticationManager;
+     AuthenticationManager authenticationManager;
 
     @Autowired
     UserRepository userRepository;
@@ -57,11 +57,21 @@ public class AuthController {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        String jwtToken = jwtUtils.generateTokenFromUsername(userDetails);
+        String jwtToken = jwtUtils.generateTokenFromUsername(userDetails.getUsername());
 
-        UserInfoResponse response = new UserInfoResponse(userDetails.getId(), userDetails.getUsername(), jwtToken);
+        // Get roles
+        String role = userDetails.getAuthorities().isEmpty() ? null : userDetails.getAuthorities().iterator().next().getAuthority();
+
+        // Return a properly formatted response
+        Map<String, Object> response = new HashMap<>();
+        response.put("id", userDetails.getId());
+        response.put("jwtToken", jwtToken);
+        response.put("username", userDetails.getUsername());
+        response.put("role", role);
+
         return ResponseEntity.ok(response);
     }
+
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {

@@ -5,6 +5,10 @@ import com.saeed.fitnessWorkoutTracker.model.Role;
 import com.saeed.fitnessWorkoutTracker.model.User;
 import com.saeed.fitnessWorkoutTracker.repository.RoleRepository;
 import com.saeed.fitnessWorkoutTracker.repository.UserRepository;
+import com.saeed.fitnessWorkoutTracker.security.jwt.AuthEntryPointJwt;
+import com.saeed.fitnessWorkoutTracker.security.jwt.AuthTokenFilter;
+import com.saeed.fitnessWorkoutTracker.security.service.UserDetailsServiceImpl;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -19,10 +23,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import com.saeed.fitnessWorkoutTracker.security.jwt.AuthEntryPointJwt;
-import com.saeed.fitnessWorkoutTracker.security.jwt.AuthTokenFilter;
-import com.saeed.fitnessWorkoutTracker.security.service.UserDetailsServiceImpl;
 
 import java.util.Optional;
 import java.util.Set;
@@ -66,19 +66,14 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
+        http.csrf(csrf -> csrf.disable()) // Disable CSRF for simplicity
+                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin())) // Allow H2 console to use frames
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/api/auth/**").permitAll()
-                                .requestMatchers("/swagger-ui/**").permitAll()
-                                .requestMatchers("/api/test/**").permitAll()
-//                                .requestMatchers("/api/**").permitAll()
-                                .requestMatchers("/h2-console/**").permitAll()
-                                .requestMatchers("/v3/api-docs/**").permitAll()
-
-                                .anyRequest().authenticated()
-                );
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/h2-console/**").permitAll() // Ensure H2 Console is accessible
+                        .requestMatchers("/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/api/test/**").permitAll()
+                        .anyRequest().authenticated());
 
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
