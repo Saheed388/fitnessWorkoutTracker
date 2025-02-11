@@ -69,4 +69,19 @@ public class JwtUtils {
         }
         return false;
     }
+    public String extractUsername(String token) {
+        try {
+            return Jwts.parser()
+                    .verifyWith((SecretKey) key())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .getSubject();
+        } catch (Exception e) {
+            logger.error("Error extracting username from token: {}", e.getMessage());
+            return null;
+        }
+    }
+
+
 }
