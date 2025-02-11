@@ -71,12 +71,7 @@ public class WorkoutController {
 
     }
 
-    @DeleteMapping("/workouts/{workoutId}")
-    public ResponseEntity<ApiResponse<WorkoutDTO>> deleteWorkout(@PathVariable Long workoutId){
 
-        WorkoutDTO deleteWorkout = workoutService.deleteWorkout(workoutId);
-        return new ResponseEntity<>(new ApiResponse<>("deleted successfully", deleteWorkout), HttpStatus.OK);
-    }
 
     @PutMapping("/workouts/{workoutId}")
     public ResponseEntity<ApiResponse<WorkoutDTO>> updateWorkout(
@@ -90,6 +85,19 @@ public class WorkoutController {
         return new ResponseEntity<>(new ApiResponse<>("Updated successfully", updatedWorkoutDTO), HttpStatus.OK);
     }
 
+
+    @DeleteMapping("/workouts/{workoutId}")
+    public ResponseEntity<ApiResponse<WorkoutDTO>> deleteWorkout(
+            @PathVariable Long workoutId,
+            @RequestHeader("Authorization") String token) {
+
+        if (token == null || !token.startsWith("Bearer ")) {
+            throw new APIException("Invalid or missing Authorization token");
+        }
+        String username = jwtUtils.getUserNameFromJwtToken(token.substring(7));
+        WorkoutDTO deletedWorkout = workoutService.deleteWorkout(workoutId, username);
+        return new ResponseEntity<>(new ApiResponse<>("Deleted successfully", deletedWorkout), HttpStatus.OK);
+    }
 
 
 

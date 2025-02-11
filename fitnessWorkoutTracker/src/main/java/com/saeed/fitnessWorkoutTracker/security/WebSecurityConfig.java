@@ -37,7 +37,7 @@ public class WebSecurityConfig {
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
 
-    private static final String SINGLE_USERNAME = "singleUser";
+    private static final String SINGLE_USERNAME = "Saheed";
     private static final String SINGLE_USER_EMAIL = "singleuser@example.com";
     private static final String SINGLE_USER_PASSWORD = "password";
 
