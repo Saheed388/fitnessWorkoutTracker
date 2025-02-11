@@ -24,16 +24,22 @@ public class WorkoutController {
     @Autowired
     WorkoutService workoutService;
 
-//    @GetMapping("/workouts")
-//    public ResponseEntity<ApiResponse<WorkoutResponse>> getAllWorkouts(
-//            @RequestParam(name = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
-//            @RequestParam(name = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
-//            @RequestParam(name = "sortBy", defaultValue = AppConstants.SORT_WORKOUTS_BY, required = false) String sortBy,
-//            @RequestParam(name = "sortOrder", defaultValue = AppConstants.SORT_DIR, required = false) String sortOrder) {
-//        WorkoutResponse workoutResponse = workoutService.getAllWorkouts(pageNumber, pageSize, sortBy, sortOrder);
-//        return new ResponseEntity<>(new ApiResponse<>("Successfully retrieved all workouts ", workoutResponse), HttpStatus.OK);
-//
-//    }
+    @GetMapping("/workouts")
+    public ResponseEntity<ApiResponse<WorkoutResponse>> getUserWorkouts(
+            @RequestParam(name = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+            @RequestParam(name = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
+            @RequestParam(name = "sortBy", defaultValue = AppConstants.SORT_WORKOUTS_BY, required = false) String sortBy,
+            @RequestParam(name = "sortOrder", defaultValue = AppConstants.SORT_DIR, required = false) String sortOrder,
+            @RequestHeader("Authorization") String token) {
+        if (token == null || !token.startsWith("Bearer ")) {
+            throw new APIException("Invalid or missing Authorization token");
+        }
+        String username = jwtUtils.getUserNameFromJwtToken(token.substring(7));
+        WorkoutResponse workoutResponse = workoutService.getUserWorkouts(username, pageNumber, pageSize, sortBy, sortOrder);
+
+        return new ResponseEntity<>(new ApiResponse<>("Successfully retrieved your workouts", workoutResponse), HttpStatus.OK);
+    }
+
 
     @PostMapping("/workouts")
     public ResponseEntity<ApiResponse<WorkoutDTO>> createWorkout(
@@ -50,22 +56,27 @@ public class WorkoutController {
 
 
 
-//    @GetMapping("/workouts/{workoutId}")
-//    public ResponseEntity<ApiResponse<WorkoutDTO>> getWorkoutById(@PathVariable Long workoutId){
-//        WorkoutDTO workoutDTO = workoutService.getContentById(workoutId);
-//        if (workoutDTO != null)
-//            return new ResponseEntity<>(new ApiResponse<>("Successfully retrieved workout by workoutId ", workoutDTO), HttpStatus.OK);
-//
-//        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//
-//    }
+    @GetMapping("/workouts/{workoutId}")
+    public ResponseEntity<ApiResponse<WorkoutDTO>> getWorkoutById(@PathVariable Long workoutId,
+                                                                  @RequestHeader("Authorization") String token){
+        if (token == null || !token.startsWith("Bearer ")) {
+            throw new APIException("Invalid or missing Authorization token");
+        }
+        String username = jwtUtils.getUserNameFromJwtToken(token.substring(7)); // Extract username from JWT
+        WorkoutDTO workoutDTO = workoutService.getWorkoutById(workoutId, username);
+        if (workoutDTO != null)
+            return new ResponseEntity<>(new ApiResponse<>("Successfully retrieved workout by workoutId ", workoutDTO), HttpStatus.OK);
 
-//    @DeleteMapping("/workouts/{workoutId}")
-//    public ResponseEntity<ApiResponse<WorkoutDTO>> deleteWorkout(@PathVariable Long workoutId){
-//
-//        WorkoutDTO deleteWorkout = workoutService.deleteWorkout(workoutId);
-//        return new ResponseEntity<>(new ApiResponse<>("deleted successfully", deleteWorkout), HttpStatus.OK);
-//    }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+    }
+
+    @DeleteMapping("/workouts/{workoutId}")
+    public ResponseEntity<ApiResponse<WorkoutDTO>> deleteWorkout(@PathVariable Long workoutId){
+
+        WorkoutDTO deleteWorkout = workoutService.deleteWorkout(workoutId);
+        return new ResponseEntity<>(new ApiResponse<>("deleted successfully", deleteWorkout), HttpStatus.OK);
+    }
 
     @PutMapping("/workouts/{workoutId}")
     public ResponseEntity<ApiResponse<WorkoutDTO>> updateWorkout(
