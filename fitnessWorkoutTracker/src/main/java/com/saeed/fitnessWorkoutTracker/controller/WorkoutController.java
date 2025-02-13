@@ -37,7 +37,7 @@ public class WorkoutController {
         String username = jwtUtils.getUserNameFromJwtToken(token.substring(7));
         WorkoutResponse workoutResponse = workoutService.getUserWorkouts(username, pageNumber, pageSize, sortBy, sortOrder);
 
-        return new ResponseEntity<>(new ApiResponse<>("Successfully retrieved your workouts", workoutResponse), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse<>("Successfully retrieved your workouts",HttpStatus.OK.value(), workoutResponse), HttpStatus.OK);
     }
 
 
@@ -51,7 +51,7 @@ public class WorkoutController {
         }
         String username = jwtUtils.getUserNameFromJwtToken(token.substring(7)); // Extract username from JWT
         WorkoutDTO savedWorkoutDTO = workoutService.createWorkout(workoutDTO, username);
-        return ResponseEntity.ok(new ApiResponse<>("Workout added successfully", savedWorkoutDTO));
+        return ResponseEntity.ok(new ApiResponse<>("Workout added successfully",HttpStatus.OK.value(), savedWorkoutDTO));
     }
 
 
@@ -65,7 +65,7 @@ public class WorkoutController {
         String username = jwtUtils.getUserNameFromJwtToken(token.substring(7)); // Extract username from JWT
         WorkoutDTO workoutDTO = workoutService.getWorkoutById(workoutId, username);
         if (workoutDTO != null)
-            return new ResponseEntity<>(new ApiResponse<>("Successfully retrieved workout by workoutId ", workoutDTO), HttpStatus.OK);
+            return new ResponseEntity<>(new ApiResponse<>("Successfully retrieved workout by workoutId ",HttpStatus.OK.value(), workoutDTO), HttpStatus.OK);
 
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
@@ -82,7 +82,7 @@ public class WorkoutController {
         String username = authentication.getName(); // Get logged-in user's username
         WorkoutDTO updatedWorkoutDTO = workoutService.updateWorkout(workoutDTO, workoutId, username);
 
-        return new ResponseEntity<>(new ApiResponse<>("Updated successfully", updatedWorkoutDTO), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse<>("Updated successfully",HttpStatus.OK.value(), updatedWorkoutDTO), HttpStatus.OK);
     }
 
 
@@ -96,7 +96,7 @@ public class WorkoutController {
         }
         String username = jwtUtils.getUserNameFromJwtToken(token.substring(7));
         WorkoutDTO deletedWorkout = workoutService.deleteWorkout(workoutId, username);
-        return new ResponseEntity<>(new ApiResponse<>("Deleted successfully", deletedWorkout), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse<>("Deleted successfully",HttpStatus.OK.value(), deletedWorkout), HttpStatus.OK);
     }
 
 

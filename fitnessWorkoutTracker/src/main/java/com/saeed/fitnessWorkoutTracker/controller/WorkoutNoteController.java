@@ -24,7 +24,7 @@ public class WorkoutNoteController {
     public ResponseEntity<ApiResponse<WorkoutNoteDTO>> addWorkoutNote(@Valid @RequestBody WorkoutNoteDTO workoutNoteDTO,
                                                                    @PathVariable Long workoutId){
         WorkoutNoteDTO savedWorkoutNoteDTO= workoutNoteService.addWorkoutNote(workoutId, workoutNoteDTO);
-        return new ResponseEntity<>(new ApiResponse<>("added successfully", savedWorkoutNoteDTO), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse<>("added successfully",HttpStatus.OK.value(), savedWorkoutNoteDTO), HttpStatus.OK);
     }
 
     @GetMapping("/workoutnotes")
@@ -50,7 +50,7 @@ public class WorkoutNoteController {
 
         WorkoutNoteResponse workoutNoteResponse = workoutNoteService.searchNoteByWorkout(workoutId, pageNumber, pageSize, sortBy, sortOrder);
 
-        ApiResponse<WorkoutNoteResponse> response = new ApiResponse<>("Successfully retrieved workout note by workoutId", workoutNoteResponse);
+        ApiResponse<WorkoutNoteResponse> response = new ApiResponse<>("Successfully retrieved workout note by workoutId", HttpStatus.OK.value(),workoutNoteResponse);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -59,7 +59,7 @@ public class WorkoutNoteController {
     public ResponseEntity<ApiResponse<WorkoutNoteDTO>> getWorkoutNoteById(@PathVariable Long workoutNoteId){
         WorkoutNoteDTO workoutNoteDTO = workoutNoteService.getWorkoutNoteById(workoutNoteId);
         if (workoutNoteDTO != null)
-            return new ResponseEntity<>(new ApiResponse<>("Successfully retrieved workout note by workoutNoteId ", workoutNoteDTO), HttpStatus.OK);
+            return new ResponseEntity<>(new ApiResponse<>("Successfully retrieved workout note by workoutNoteId ",HttpStatus.OK.value(), workoutNoteDTO), HttpStatus.OK);
 
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
@@ -68,12 +68,12 @@ public class WorkoutNoteController {
     public ResponseEntity<ApiResponse<WorkoutNoteDTO>> updateWorkoutNote(@Valid @RequestBody WorkoutNoteDTO workoutNoteDTO,
                                                                    @PathVariable Long workoutNoteId) {
         WorkoutNoteDTO updatedWorkoutNoteDTO = workoutNoteService.updateWorkoutNote(workoutNoteId, workoutNoteDTO);
-        return new ResponseEntity<>(new ApiResponse<>("Updated Successfully", updatedWorkoutNoteDTO), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse<>("Updated Successfully",HttpStatus.OK.value(), updatedWorkoutNoteDTO), HttpStatus.OK);
     }
 
     @DeleteMapping("/workoutnote/{workoutNoteId}")
     public ResponseEntity<ApiResponse<WorkoutNoteDTO>> deleteWorkoutNote(@PathVariable Long workoutNoteId){
         WorkoutNoteDTO deletedWorkoutNoteDTO = workoutNoteService.deleteworkoutNote(workoutNoteId);
-        return new ResponseEntity<>(new ApiResponse<>("deleted successfully", deletedWorkoutNoteDTO), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse<>("deleted successfully",HttpStatus.OK.value(), deletedWorkoutNoteDTO), HttpStatus.OK);
     }
 }

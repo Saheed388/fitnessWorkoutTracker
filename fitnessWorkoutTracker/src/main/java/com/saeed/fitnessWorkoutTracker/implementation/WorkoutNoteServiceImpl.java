@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -87,7 +88,7 @@ public class WorkoutNoteServiceImpl implements WorkoutNoteService {
         workoutNoteResponse.setTotalPages(pageWorkoutNotes.getTotalPages());
         workoutNoteResponse.setLastPage(pageWorkoutNotes.isLast());
 
-        return new ApiResponse<>("Successfully retrieved all Workout Notes ", workoutNoteResponse);
+        return new ApiResponse<>("Successfully retrieved all Workout Notes ", HttpStatus.OK.value(), workoutNoteResponse);
     }
 
 
@@ -141,7 +142,7 @@ public class WorkoutNoteServiceImpl implements WorkoutNoteService {
 
         WorkoutNote savedWorkoutNote = workoutNoteRepository.save(workoutNoteFromDb);
 
-        return new ApiResponse<>("Updated Successfully", modelMapper.map(savedWorkoutNote, WorkoutNoteDTO.class)).getData();
+        return new ApiResponse<>("Updated Successfully", HttpStatus.OK.value(),modelMapper.map(savedWorkoutNote, WorkoutNoteDTO.class)).getData();
     }
 
     @Override

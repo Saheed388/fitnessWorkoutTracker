@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -87,7 +88,7 @@ public class ExerciseServiceImpl implements ExerciseService {
         exerciseResponse.setTotalPages(pageExercises.getTotalPages());
         exerciseResponse.setLastPage(pageExercises.isLast());
 
-        return new ApiResponse<>("Successfully retrieved all exercises ", exerciseResponse);
+        return new ApiResponse<>("Successfully retrieved all exercises ", HttpStatus.OK.value(), exerciseResponse);
     }
 
     @Override
@@ -145,7 +146,7 @@ public class ExerciseServiceImpl implements ExerciseService {
 
         Exercise savedExercise = exerciseRepository.save(exerciseFromDb);
 
-        return new ApiResponse<>("Updated Successfully", modelMapper.map(savedExercise, ExerciseDTO.class)).getData();
+        return new ApiResponse<>("Updated Successfully",HttpStatus.OK.value(), modelMapper.map(savedExercise, ExerciseDTO.class)).getData();
     }
 
 

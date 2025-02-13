@@ -25,7 +25,7 @@ public class ExerciseController {
     public ResponseEntity<ApiResponse<ExerciseDTO>> addExercise(@Valid @RequestBody ExerciseDTO exerciseDTO,
                                                   @PathVariable Long workoutId){
         ExerciseDTO savedExerciseDTO= exerciseService.addExercise(workoutId, exerciseDTO);
-        return new ResponseEntity<>(new ApiResponse<>("added successfully", savedExerciseDTO), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse<>("added successfully",HttpStatus.OK.value(), savedExerciseDTO), HttpStatus.OK);
     }
 
 
@@ -54,7 +54,7 @@ public class ExerciseController {
 
         ExerciseResponse exerciseResponse = exerciseService.searchByWorkout(workoutId, pageNumber, pageSize, sortBy, sortOrder);
 
-        ApiResponse<ExerciseResponse> response = new ApiResponse<>("Successfully retrieved exercises by workoutId", exerciseResponse);
+        ApiResponse<ExerciseResponse> response = new ApiResponse<>("Successfully retrieved exercises by workoutId", HttpStatus.OK.value(),exerciseResponse);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -63,7 +63,7 @@ public class ExerciseController {
     public ResponseEntity<ApiResponse<ExerciseDTO>> getExerciseById(@PathVariable Long exerciseId){
         ExerciseDTO exerciseDTO = exerciseService.getExerciseById(exerciseId);
         if (exerciseDTO != null)
-            return new ResponseEntity<>(new ApiResponse<>("Successfully retrieved exercise by exerciseId ", exerciseDTO), HttpStatus.OK);
+            return new ResponseEntity<>(new ApiResponse<>("Successfully retrieved exercise by exerciseId ",HttpStatus.OK.value(), exerciseDTO), HttpStatus.OK);
 
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
@@ -73,14 +73,14 @@ public class ExerciseController {
     public ResponseEntity<ApiResponse<ExerciseDTO>> updateExercise(@Valid @RequestBody ExerciseDTO exerciseDTO,
                                                                    @PathVariable Long exerciseId) {
         ExerciseDTO updatedExerciseDTO = exerciseService.updateExercise(exerciseId, exerciseDTO);
-        return new ResponseEntity<>(new ApiResponse<>("Updated Successfully", updatedExerciseDTO), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse<>("Updated Successfully", HttpStatus.OK.value(),updatedExerciseDTO), HttpStatus.OK);
     }
 
 
     @DeleteMapping("/exercises/{exerciseId}")
     public ResponseEntity<ApiResponse<ExerciseDTO>> deleteExercise(@PathVariable Long exerciseId){
         ExerciseDTO deletedExerciseDTO = exerciseService.deleteExercise(exerciseId);
-        return new ResponseEntity<>(new ApiResponse<>("deleted successfully", deletedExerciseDTO), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse<>("deleted successfully",HttpStatus.OK.value(), deletedExerciseDTO), HttpStatus.OK);
     }
 }
 
