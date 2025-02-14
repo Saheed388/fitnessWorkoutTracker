@@ -50,6 +50,10 @@ public class User {
             cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private List<WorkoutReport> workoutReports = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    private List<Exercise> exercises = new ArrayList<>();
+
     // Many-to-Many Relationship for Roles
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles",

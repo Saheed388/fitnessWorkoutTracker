@@ -39,5 +39,10 @@ public class Exercise {
     @JoinColumn(name = "workout_id")
     private Workout workout;
 
+    @ManyToOne // Each exercise belongs to one user
+    @JoinColumn(name = "user_id", nullable = false) // Ensure correct foreign key
+    private User user;
+
+
 }
 

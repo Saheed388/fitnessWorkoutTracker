@@ -4,11 +4,13 @@ import com.saeed.fitnessWorkoutTracker.exception.APIException;
 import com.saeed.fitnessWorkoutTracker.exception.ApiResponse;
 import com.saeed.fitnessWorkoutTracker.exception.ResourceNotFoundException;
 import com.saeed.fitnessWorkoutTracker.model.Exercise;
+import com.saeed.fitnessWorkoutTracker.model.User;
 import com.saeed.fitnessWorkoutTracker.model.Workout;
 import com.saeed.fitnessWorkoutTracker.payload.ExerciseDTO;
 import com.saeed.fitnessWorkoutTracker.payload.ExerciseResponse;
 import com.saeed.fitnessWorkoutTracker.payload.WorkoutDTO;
 import com.saeed.fitnessWorkoutTracker.repository.ExerciseRepository;
+import com.saeed.fitnessWorkoutTracker.repository.UserRepository;
 import com.saeed.fitnessWorkoutTracker.repository.WorkoutRepository;
 import com.saeed.fitnessWorkoutTracker.service.ExerciseService;
 import org.modelmapper.ModelMapper;
@@ -33,53 +35,58 @@ public class ExerciseServiceImpl implements ExerciseService {
     @Autowired
     WorkoutRepository workoutRepository;
 
+    @Autowired
+    UserRepository userRepository;
+
+
 
 
     @Override
-    public ExerciseDTO addExercise(Long workoutId, ExerciseDTO exerciseDTO) {
+    public ExerciseDTO addExercise(String username, Long workoutId, ExerciseDTO exerciseDTO) {
+        // Fetch user and validate
+        User user = userRepository.findByUserName(username)
+                .orElseThrow(() -> new APIException("User not found with username: " + username));
+
+        // Fetch workout and validate ownership
         Workout workout = workoutRepository.findById(workoutId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Workout", "workoutId", workoutId));
+                .orElseThrow(() -> new ResourceNotFoundException("Workout", "workoutId", workoutId));
 
-        boolean isExerciseNotPresent = true;
-
-        List<Exercise> exercises = workout.getExercises();
-        for (Exercise value : exercises) {
-            if (value.getExerciseName().equals(exerciseDTO.getExerciseName())) {
-                isExerciseNotPresent = false;
-                break;
-            }
+        if (!workout.getUser().getUserId().equals(user.getUserId())) {
+            throw new APIException("You are not authorized to modify this workout.");
+        }
+        // Check if the exercise already exists
+        boolean exerciseExists = workout.getExercises().stream()
+                .anyMatch(exercise -> exercise.getExerciseName().equalsIgnoreCase(exerciseDTO.getExerciseName()));
+        if (exerciseExists) {
+            throw new APIException("Exercise already exists!!");
         }
 
-        if (isExerciseNotPresent) {
-            Exercise exercise = modelMapper.map(exerciseDTO, Exercise.class);
-            exercise.setWorkout(workout);
+        // Map and save the new exercise
+        Exercise exercise = modelMapper.map(exerciseDTO, Exercise.class);
+        exercise.setWorkout(workout);
+        exercise.setUser(user); // ✅ Set the User object correctly
 
-            Exercise savedExercise = exerciseRepository.save(exercise);
-            return modelMapper.map(savedExercise, ExerciseDTO.class);
-        } else {
-            throw new APIException("Product already exist!!");
-        }
+        Exercise savedExercise = exerciseRepository.save(exercise);
+
+        return modelMapper.map(savedExercise, ExerciseDTO.class);
     }
 
 
 
-
     @Override
-    public ApiResponse<ExerciseResponse> getAllExercises(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+    public ApiResponse<ExerciseResponse> getAllExercises(String username, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+        User user = userRepository.findByUserName(username)
+                .orElseThrow(() -> new APIException("User not found with username: " + username));
         Sort sortByAndOrder = sortOrder.equalsIgnoreCase("asc")
                 ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
-
         Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
-        Page<Exercise> pageExercises = exerciseRepository.findAll(pageDetails);
-
-        List<Exercise> exercises = pageExercises.getContent();
-
-        List<ExerciseDTO> exerciseDTOS = exercises.stream()
+        // Fetch only exercises belonging to the authenticated user
+        Page<Exercise> pageExercises = exerciseRepository.findByUser(user, pageDetails);
+        List<ExerciseDTO> exerciseDTOS = pageExercises.getContent().stream()
                 .map(exercise -> modelMapper.map(exercise, ExerciseDTO.class))
                 .toList();
-
+        // Construct response
         ExerciseResponse exerciseResponse = new ExerciseResponse();
         exerciseResponse.setExerciseDTOS(exerciseDTOS);
         exerciseResponse.setPageNumber(pageExercises.getNumber());
@@ -88,41 +95,36 @@ public class ExerciseServiceImpl implements ExerciseService {
         exerciseResponse.setTotalPages(pageExercises.getTotalPages());
         exerciseResponse.setLastPage(pageExercises.isLast());
 
-        return new ApiResponse<>("Successfully retrieved all exercises ", HttpStatus.OK.value(), exerciseResponse);
-    }
-
-    @Override
-    public ExerciseDTO getExerciseById(Long exerciseId) {
-        return exerciseRepository.findById(exerciseId)
-                .map(exercise -> modelMapper.map(exercise, ExerciseDTO.class))
-                .orElseThrow(()-> new ResourceNotFoundException("Exercise", "exerciseId", exerciseId));
+        return new ApiResponse<>("Successfully retrieved all exercises", HttpStatus.OK.value(), exerciseResponse);
     }
 
 
-    @Override
-    public ExerciseResponse searchByWorkout(Long workoutId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
 
+    @Override
+    public ExerciseResponse searchByWorkout(String username, Long workoutId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+        // Validate user existence
+        User user = userRepository.findByUserName(username)
+                .orElseThrow(() -> new APIException("User not found with username: " + username));
+        // Validate workout existence
         Workout workout = workoutRepository.findById(workoutId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Workout", "workoutId", workoutId));
-
-        Sort sortByAndOrder = sortOrder.equalsIgnoreCase("asc")
+                .orElseThrow(() -> new ResourceNotFoundException("Workout", "workoutId", workoutId));
+        // Default sorting field if sortBy is invalid
+        List<String> validSortFields = List.of("exerciseName", "repetitions", "duration"); // Ensure these fields exist in Exercise
+        if (!validSortFields.contains(sortBy)) {
+            sortBy = "exerciseName"; // Default field
+        }
+        Sort sort = sortOrder.equalsIgnoreCase("asc")
                 ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
-
-        Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
-        Page<Exercise> pageExercises = exerciseRepository.findByWorkoutOrderByExercisesRepetitionsAsc(workout, pageDetails);
-
-        List<Exercise> exercises = pageExercises.getContent();
-
-        if (exercises.isEmpty()) {
-            throw new APIException(workout.getTitle() + " workout does not have any exercise");
+        Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sort);
+        Page<Exercise> pageExercises = exerciseRepository.findByWorkout(workout, pageDetails);
+        if (pageExercises.isEmpty()) {
+            throw new APIException(workout.getTitle() + " workout does not have any exercises.");
         }
-
-        List<ExerciseDTO> exerciseDTOS = exercises.stream()
+        List<ExerciseDTO> exerciseDTOS = pageExercises.getContent()
+                .stream()
                 .map(exercise -> modelMapper.map(exercise, ExerciseDTO.class))
                 .toList();
-
         ExerciseResponse exerciseResponse = new ExerciseResponse();
         exerciseResponse.setExerciseDTOS(exerciseDTOS);
         exerciseResponse.setPageNumber(pageExercises.getNumber());
@@ -130,11 +132,27 @@ public class ExerciseServiceImpl implements ExerciseService {
         exerciseResponse.setTotalElements(pageExercises.getTotalElements());
         exerciseResponse.setTotalPages(pageExercises.getTotalPages());
         exerciseResponse.setLastPage(pageExercises.isLast());
+
         return exerciseResponse;
     }
 
     @Override
-    public ExerciseDTO updateExercise(Long exerciseId, ExerciseDTO exerciseDTO) {
+    public ExerciseDTO getExerciseById(String username, Long exerciseId) {
+        User user = userRepository.findByUserName(username)
+                .orElseThrow(() -> new APIException("User not found with username: " + username));
+
+        Exercise exercise = exerciseRepository.findById(exerciseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Exercise", "exerciseId", exerciseId));
+
+        if (!exercise.getUser().getUserId().equals(user.getUserId())) {
+            throw new APIException("You can only access your own exercise");
+        }
+        return modelMapper.map(exercise, ExerciseDTO.class);
+
+    }
+
+    @Override
+    public ExerciseDTO updateExercise(String username, Long exerciseId, ExerciseDTO exerciseDTO) {
         Exercise exerciseFromDb = exerciseRepository.findById(exerciseId)
                 .orElseThrow(() -> new ResourceNotFoundException("Exercise", "exerciseId", exerciseId));
 
@@ -150,16 +168,16 @@ public class ExerciseServiceImpl implements ExerciseService {
     }
 
 
-    @Override
-    public ExerciseDTO deleteExercise(Long exerciseId) {
-
-        Exercise exercise = exerciseRepository.findById(exerciseId)
-                .orElseThrow(() -> new ResourceNotFoundException("Exercise", "exerciseId", exerciseId));
-
-        exerciseRepository.delete(exercise);
-        return modelMapper.map(exercise, ExerciseDTO.class);
-
-    }
+//    @Override
+//    public ExerciseDTO deleteExercise(Long exerciseId) {
+//
+//        Exercise exercise = exerciseRepository.findById(exerciseId)
+//                .orElseThrow(() -> new ResourceNotFoundException("Exercise", "exerciseId", exerciseId));
+//
+//        exerciseRepository.delete(exercise);
+//        return modelMapper.map(exercise, ExerciseDTO.class);
+//
+//    }
 
 
 }
