@@ -64,7 +64,7 @@ public class ExerciseServiceImpl implements ExerciseService {
         // Map and save the new exercise
         Exercise exercise = modelMapper.map(exerciseDTO, Exercise.class);
         exercise.setWorkout(workout);
-        exercise.setUser(user); // ✅ Set the User object correctly
+        exercise.setUser(user); //
 
         Exercise savedExercise = exerciseRepository.save(exercise);
 
@@ -156,29 +156,35 @@ public class ExerciseServiceImpl implements ExerciseService {
         Exercise exerciseFromDb = exerciseRepository.findById(exerciseId)
                 .orElseThrow(() -> new ResourceNotFoundException("Exercise", "exerciseId", exerciseId));
 
+        User user = userRepository.findByUserName(username)
+                        .orElseThrow(()-> new APIException("User not found with username:" + username));
+        if (!exerciseFromDb.getUser().getUserId().equals(user.getUserId())) {
+            throw new APIException("You can only update your own exercise !");
+        }
+
         exerciseFromDb.setExerciseName(exerciseDTO.getExerciseName());
         exerciseFromDb.setSetsExercises(exerciseDTO.getSetsExercises());
         exerciseFromDb.setExercisesRepetitions(exerciseDTO.getExercisesRepetitions());
         exerciseFromDb.setCompleted(exerciseDTO.getCompleted());
         exerciseFromDb.setCreatedAt(exerciseDTO.getCreatedAt());
-
         Exercise savedExercise = exerciseRepository.save(exerciseFromDb);
-
         return new ApiResponse<>("Updated Successfully",HttpStatus.OK.value(), modelMapper.map(savedExercise, ExerciseDTO.class)).getData();
     }
 
+    @Override
+    public ExerciseDTO deleteExercise(String username, Long exerciseId) {
+        Exercise exerciseFromDb = exerciseRepository.findById(exerciseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Exercise", "exerciseId", exerciseId));
 
-//    @Override
-//    public ExerciseDTO deleteExercise(Long exerciseId) {
-//
-//        Exercise exercise = exerciseRepository.findById(exerciseId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Exercise", "exerciseId", exerciseId));
-//
-//        exerciseRepository.delete(exercise);
-//        return modelMapper.map(exercise, ExerciseDTO.class);
-//
-//    }
+        User user = userRepository.findByUserName(username)
+                .orElseThrow(()-> new APIException("User not found with username:" + username));
+        if (!exerciseFromDb.getUser().getUserId().equals(user.getUserId())) {
+            throw new APIException("You can only update your own exercise !");
+        }
 
+        exerciseRepository.delete(exerciseFromDb);
+        return modelMapper.map(exerciseFromDb, ExerciseDTO.class);
+    }
 
 }
 

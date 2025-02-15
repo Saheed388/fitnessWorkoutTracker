@@ -9,13 +9,6 @@ import jakarta.validation.Valid;
 public interface ExerciseService {
 
 
-//    ExerciseResponse searchByWorkout(Long workoutId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
-
-
-    ExerciseDTO deleteExercise(Long exerciseId);
-
-
-
 
     ExerciseDTO addExercise(String username, Long workoutId, @Valid ExerciseDTO exerciseDTO);
 
@@ -26,4 +19,6 @@ public interface ExerciseService {
     ExerciseDTO getExerciseById(String username, Long exerciseId);
 
     ExerciseDTO updateExercise(String username, Long exerciseId, @Valid ExerciseDTO exerciseDTO);
+
+    ExerciseDTO deleteExercise(String username, Long exerciseId);
 }

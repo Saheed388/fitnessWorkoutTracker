@@ -113,8 +113,14 @@ public class ExerciseController {
 
 
     @DeleteMapping("/exercises/{exerciseId}")
-    public ResponseEntity<ApiResponse<ExerciseDTO>> deleteExercise(@PathVariable Long exerciseId){
-        ExerciseDTO deletedExerciseDTO = exerciseService.deleteExercise(exerciseId);
+    public ResponseEntity<ApiResponse<ExerciseDTO>> deleteExercise(@PathVariable Long exerciseId,
+                                                                   @RequestHeader("Authorization") String token){
+        if (token   == null || !token.startsWith("Bearer ")){
+            throw new APIException("Invalid or missing Authorization token");
+        }
+        String username = jwtUtils.getUserNameFromJwtToken(token.substring(7));
+
+        ExerciseDTO deletedExerciseDTO = exerciseService.deleteExercise(username, exerciseId);
         return new ResponseEntity<>(new ApiResponse<>("deleted successfully",HttpStatus.OK.value(), deletedExerciseDTO), HttpStatus.OK);
     }
 }
