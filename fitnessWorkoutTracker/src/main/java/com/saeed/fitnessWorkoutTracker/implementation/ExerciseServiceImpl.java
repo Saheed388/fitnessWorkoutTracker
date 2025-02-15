@@ -52,7 +52,7 @@ public class ExerciseServiceImpl implements ExerciseService {
                 .orElseThrow(() -> new ResourceNotFoundException("Workout", "workoutId", workoutId));
 
         if (!workout.getUser().getUserId().equals(user.getUserId())) {
-            throw new APIException("You are not authorized to modify this workout.");
+            throw new APIException("You are not authorized to modify this exercise.");
         }
         // Check if the exercise already exists
         boolean exerciseExists = workout.getExercises().stream()

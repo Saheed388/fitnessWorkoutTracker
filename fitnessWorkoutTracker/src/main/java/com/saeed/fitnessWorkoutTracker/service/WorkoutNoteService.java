@@ -8,15 +8,19 @@ import jakarta.validation.Valid;
 
 public interface WorkoutNoteService {
 
-    WorkoutNoteDTO addWorkoutNote(Long workoutId, @Valid WorkoutNoteDTO workoutNoteDTO);
 
-    ApiResponse<WorkoutNoteResponse> getAllWorkoutNote(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
+    WorkoutNoteDTO addWorkoutNote(String username, Long workoutId, @Valid WorkoutNoteDTO workoutNoteDTO);
 
-    WorkoutNoteResponse searchNoteByWorkout(Long workoutId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
+    ApiResponse<WorkoutNoteResponse> getAllWorkoutNote(String username, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
 
-    WorkoutNoteDTO getWorkoutNoteById(Long workoutNoteId);
+    WorkoutNoteResponse searchNoteByWorkout(String username, Long workoutId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
 
-    WorkoutNoteDTO updateWorkoutNote(Long workoutNoteId, @Valid WorkoutNoteDTO workoutNoteDTO);
+    WorkoutNoteDTO getWorkoutNoteById(String username, Long workoutNoteId);
 
-    WorkoutNoteDTO deleteworkoutNote(Long workoutNoteId);
+    WorkoutNoteDTO updateWorkoutNote(String username, Long workoutNoteId, @Valid WorkoutNoteDTO workoutNoteDTO);
+
+    WorkoutNoteDTO deleteWorkoutNote(String username, Long workoutNoteId);
+
 }
+
+

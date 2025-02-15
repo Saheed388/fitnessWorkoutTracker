@@ -39,9 +39,7 @@ public class ExerciseController {
         if (username == null || username.isEmpty()) {
             throw new APIException("Invalid JWT token. Unable to extract username.");
         }
-        // Debugging log (Ensure logging is configured)
-        System.out.println("Extracted Username: " + username);
-        // Add exercise
+
         ExerciseDTO savedExerciseDTO = exerciseService.addExercise(username, workoutId, exerciseDTO);
         return ResponseEntity.ok(new ApiResponse<>("Added successfully", HttpStatus.OK.value(), savedExerciseDTO));
     }

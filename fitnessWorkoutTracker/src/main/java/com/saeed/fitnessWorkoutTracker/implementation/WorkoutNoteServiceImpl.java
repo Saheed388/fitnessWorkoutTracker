@@ -3,12 +3,12 @@ package com.saeed.fitnessWorkoutTracker.implementation;
 import com.saeed.fitnessWorkoutTracker.exception.APIException;
 import com.saeed.fitnessWorkoutTracker.exception.ApiResponse;
 import com.saeed.fitnessWorkoutTracker.exception.ResourceNotFoundException;
-import com.saeed.fitnessWorkoutTracker.model.Exercise;
+import com.saeed.fitnessWorkoutTracker.model.User;
 import com.saeed.fitnessWorkoutTracker.model.Workout;
 import com.saeed.fitnessWorkoutTracker.model.WorkoutNote;
-import com.saeed.fitnessWorkoutTracker.payload.ExerciseDTO;
 import com.saeed.fitnessWorkoutTracker.payload.WorkoutNoteDTO;
 import com.saeed.fitnessWorkoutTracker.payload.WorkoutNoteResponse;
+import com.saeed.fitnessWorkoutTracker.repository.UserRepository;
 import com.saeed.fitnessWorkoutTracker.repository.WorkoutNoteRepository;
 import com.saeed.fitnessWorkoutTracker.repository.WorkoutRepository;
 import com.saeed.fitnessWorkoutTracker.service.WorkoutNoteService;
@@ -36,43 +36,45 @@ public class WorkoutNoteServiceImpl implements WorkoutNoteService {
     @Autowired
     WorkoutNoteRepository workoutNoteRepository;
 
+    @Autowired
+    UserRepository userRepository;
+
 
     @Override
-    public WorkoutNoteDTO addWorkoutNote(Long workoutId, WorkoutNoteDTO workoutNoteDTO) {
+    public WorkoutNoteDTO addWorkoutNote(String username, Long workoutId, WorkoutNoteDTO workoutNoteDTO) {
+        User user = userRepository.findByUserName(username)
+                .orElseThrow(() -> new APIException("User not found with username: " + username));
         Workout workout = workoutRepository.findById(workoutId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Workout", "workoutId", workoutId));
-
-        boolean isWorkoutNoteNotPresent = true;
-
-        List<WorkoutNote> workoutNotes = workout.getWorkoutNotes();
-        for (WorkoutNote value : workoutNotes) {
-            if (value.getNote().equals(workoutNoteDTO.getNote())) {
-                isWorkoutNoteNotPresent = false;
-                break;
-            }
+        if (!workout.getUser().getUserId().equals(user.getUserId())) {
+            throw new APIException("You are not authorized to modify this workout.");
         }
-
-        if (isWorkoutNoteNotPresent) {
+        boolean workoutNoteExist = workout.getWorkoutNotes().stream()
+                .anyMatch(workoutNote -> workoutNote.getWorkoutNoteId().equals(workoutNoteDTO.getWorkoutNoteId()));
+        if(workoutNoteExist){
+            throw new APIException("Workout note already exist");
+        }
             WorkoutNote workoutNote = modelMapper.map(workoutNoteDTO, WorkoutNote.class);
             workoutNote.setWorkout(workout);
-
+            workoutNote.setUser(user);
             WorkoutNote savedWorkoutNote = workoutNoteRepository.save(workoutNote);
             return modelMapper.map(savedWorkoutNote, WorkoutNoteDTO.class);
-        } else {
-            throw new APIException("WorkoutNote already exist!!");
-        }
+
     }
 
 
+
     @Override
-    public ApiResponse<WorkoutNoteResponse> getAllWorkoutNote(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+    public ApiResponse<WorkoutNoteResponse> getAllWorkoutNote(String username, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+        User user = userRepository.findByUserName(username)
+                .orElseThrow(() -> new APIException("User not found with username: " + username));
         Sort sortByAndOrder = sortOrder.equalsIgnoreCase("asc")
                 ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
 
         Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
-        Page<WorkoutNote> pageWorkoutNotes = workoutNoteRepository.findAll(pageDetails);
+        Page<WorkoutNote> pageWorkoutNotes = workoutNoteRepository.findByUser(user,pageDetails);
 
         List<WorkoutNote> workoutNotes = pageWorkoutNotes.getContent();
 
@@ -93,25 +95,33 @@ public class WorkoutNoteServiceImpl implements WorkoutNoteService {
 
 
 
+
     @Override
-    public WorkoutNoteResponse searchNoteByWorkout(Long workoutId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
-        Workout workout = workoutRepository.findById(workoutId)
+    public WorkoutNoteResponse searchNoteByWorkout(String username, Long workoutId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+        User user = userRepository.findByUserName(username)
+                .orElseThrow(() -> new APIException("User not found with username: " + username));
+
+           Workout workout = workoutRepository.findById(workoutId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Workout", "workoutId", workoutId));
+
+        List<String> validSortFields = List.of("note", "createdAt"); // Ensure these fields exist in Exercise
+        if (!validSortFields.contains(sortBy)) {
+            sortBy = "createdAt"; // Default field
+        }
 
         Sort sortByAndOrder = sortOrder.equalsIgnoreCase("asc")
                 ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
 
         Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
-        Page<WorkoutNote> pageWorkoutNote = workoutNoteRepository.findByWorkoutOrderByWorkoutNoteIdAsc(workout, pageDetails);
-        List<WorkoutNote> workoutNotes = pageWorkoutNote.getContent();
+        Page<WorkoutNote> pageWorkoutNote = workoutNoteRepository.findByWorkout(workout, pageDetails);
 
-        if (workoutNotes.isEmpty()) {
+        if (pageWorkoutNote.isEmpty()) {
             throw new APIException(workout.getWorkoutNotes() + " workout does not have any Note");
         }
 
-        List<WorkoutNoteDTO> workoutNoteDTOS = workoutNotes.stream()
+        List<WorkoutNoteDTO> workoutNoteDTOS = pageWorkoutNote.getContent().stream()
                 .map(workoutNote -> modelMapper.map(workoutNote, WorkoutNoteDTO.class))
                 .toList();
 
@@ -126,16 +136,31 @@ public class WorkoutNoteServiceImpl implements WorkoutNoteService {
     }
 
     @Override
-    public WorkoutNoteDTO getWorkoutNoteById(Long workoutNoteId) {
-        return workoutNoteRepository.findById(workoutNoteId)
-                .map(workoutNote -> modelMapper.map(workoutNote, WorkoutNoteDTO.class))
+    public WorkoutNoteDTO getWorkoutNoteById(String username, Long workoutNoteId) {
+        User user = userRepository.findByUserName(username)
+                .orElseThrow(() -> new APIException("User not found with username: " + username));
+
+        WorkoutNote workoutNote = workoutNoteRepository.findById(workoutNoteId)
                 .orElseThrow(()-> new ResourceNotFoundException("WorkoutNote", "workoutNoteId", workoutNoteId));
+
+        if (!workoutNote.getUser().getUserId().equals(user.getUserId())) {
+            throw new APIException("You can only access your own workoutNote");
+        }
+        return  modelMapper.map(workoutNote, WorkoutNoteDTO.class);
     }
 
+
     @Override
-    public WorkoutNoteDTO updateWorkoutNote(Long workoutNoteId, WorkoutNoteDTO workoutNoteDTO) {
-        WorkoutNote workoutNoteFromDb = workoutNoteRepository.findById(workoutNoteId)
+    public WorkoutNoteDTO updateWorkoutNote(String username, Long workoutNoteId, WorkoutNoteDTO workoutNoteDTO){
+    WorkoutNote workoutNoteFromDb = workoutNoteRepository.findById(workoutNoteId)
                 .orElseThrow(() -> new ResourceNotFoundException("WorkoutNote", "workoutNoteId", workoutNoteId));
+
+        User user = userRepository.findByUserName(username)
+                .orElseThrow(()-> new APIException("User not found with username:" + username));
+
+        if (!workoutNoteFromDb.getUser().getUserId().equals(user.getUserId())) {
+            throw new APIException("You can only update your own exercise !");
+        }
 
         workoutNoteFromDb.setNote(workoutNoteDTO.getNote());
         workoutNoteFromDb.setCreatedAt(workoutNoteDTO.getCreatedAt());
@@ -145,14 +170,26 @@ public class WorkoutNoteServiceImpl implements WorkoutNoteService {
         return new ApiResponse<>("Updated Successfully", HttpStatus.OK.value(),modelMapper.map(savedWorkoutNote, WorkoutNoteDTO.class)).getData();
     }
 
+
+
+
     @Override
-    public WorkoutNoteDTO deleteworkoutNote(Long workoutNoteId) {
-        WorkoutNote workoutNote = workoutNoteRepository.findById(workoutNoteId)
+    public WorkoutNoteDTO deleteWorkoutNote(String username, Long workoutNoteId) {
+        WorkoutNote workoutNoteFromDb = workoutNoteRepository.findById(workoutNoteId)
                 .orElseThrow(() -> new ResourceNotFoundException("WorkoutNote", "workoutNoteId", workoutNoteId));
 
-        workoutNoteRepository.delete(workoutNote);
-        return modelMapper.map(workoutNote, WorkoutNoteDTO.class);
+        User user = userRepository.findByUserName(username)
+                .orElseThrow(()-> new APIException("User not found with username:" + username));
+        if (!workoutNoteFromDb.getUser().getUserId().equals(user.getUserId())) {
+            throw new APIException("You can only update your own workout note !");
+        }
+
+        workoutNoteRepository.delete(workoutNoteFromDb);
+        return modelMapper.map(workoutNoteFromDb, WorkoutNoteDTO.class);
     }
+
+
+
 }
 
 
