@@ -101,13 +101,18 @@ public class WorkoutNoteServiceImpl implements WorkoutNoteService {
         User user = userRepository.findByUserName(username)
                 .orElseThrow(() -> new APIException("User not found with username: " + username));
 
-           Workout workout = workoutRepository.findById(workoutId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Workout", "workoutId", workoutId));
+        Workout workout = workoutRepository.findById(workoutId)
+                .orElseThrow(() -> new ResourceNotFoundException("Workout", "workoutId", workoutId));
 
-        List<String> validSortFields = List.of("note", "createdAt"); // Ensure these fields exist in Exercise
+        // Ensure the workout belongs to the authenticated user
+        if (!workout.getUser().getUserId().equals(user.getUserId())) {
+            throw new APIException("Unauthorized access! You can only search notes for your own workout.");
+        }
+
+        // Ensure valid sort fields
+        List<String> validSortFields = List.of("note", "createdAt");
         if (!validSortFields.contains(sortBy)) {
-            sortBy = "createdAt"; // Default field
+            sortBy = "createdAt"; // Default sorting field
         }
 
         Sort sortByAndOrder = sortOrder.equalsIgnoreCase("asc")
@@ -118,7 +123,7 @@ public class WorkoutNoteServiceImpl implements WorkoutNoteService {
         Page<WorkoutNote> pageWorkoutNote = workoutNoteRepository.findByWorkout(workout, pageDetails);
 
         if (pageWorkoutNote.isEmpty()) {
-            throw new APIException(workout.getWorkoutNotes() + " workout does not have any Note");
+            throw new APIException("Workout does not have any notes.");
         }
 
         List<WorkoutNoteDTO> workoutNoteDTOS = pageWorkoutNote.getContent().stream()
@@ -132,8 +137,10 @@ public class WorkoutNoteServiceImpl implements WorkoutNoteService {
         workoutNoteResponse.setTotalElements(pageWorkoutNote.getTotalElements());
         workoutNoteResponse.setTotalPages(pageWorkoutNote.getTotalPages());
         workoutNoteResponse.setLastPage(pageWorkoutNote.isLast());
+
         return workoutNoteResponse;
     }
+
 
     @Override
     public WorkoutNoteDTO getWorkoutNoteById(String username, Long workoutNoteId) {
