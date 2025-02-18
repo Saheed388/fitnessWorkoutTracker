@@ -4,6 +4,10 @@ import com.saeed.fitnessWorkoutTracker.payload.WorkoutDTO;
 import com.saeed.fitnessWorkoutTracker.payload.WorkoutResponse;
 import jakarta.validation.Valid;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
 public interface WorkoutService {
 
 
@@ -18,6 +22,8 @@ public interface WorkoutService {
     WorkoutDTO getWorkoutById(Long workoutId, String username);
 
     WorkoutDTO deleteWorkout(Long workoutId, String username);
+
+
 }
 
 

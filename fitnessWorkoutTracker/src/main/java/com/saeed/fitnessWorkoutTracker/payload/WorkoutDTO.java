@@ -13,8 +13,8 @@ public class WorkoutDTO {
 
     private Long workoutId;
     private String title;
-    private LocalDate scheduled_date;
-    private LocalDateTime created_at;
+    private LocalDate ScheduledDate;
+    private LocalDateTime createdAt;
     private Long userId;
     private Boolean completed;
 

@@ -1,5 +1,7 @@
 package com.saeed.fitnessWorkoutTracker.security.response;
 
+import java.util.List;
+
 public class UserInfoResponse {
     private Long id;
     private String jwtToken;
@@ -12,6 +14,8 @@ public class UserInfoResponse {
         this.role = role;
         this.jwtToken = jwtToken;
     }
+
+
 
     // Remove the incorrect constructor
     // public UserInfoResponse(Long id, String username, String jwtToken) { }

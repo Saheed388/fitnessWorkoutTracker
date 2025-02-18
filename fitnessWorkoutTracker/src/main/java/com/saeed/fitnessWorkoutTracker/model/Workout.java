@@ -25,8 +25,8 @@ public class Workout {
     @Size(min = 5, message = "Title must contain at least 5 characters")
     private String title;
 
-    private LocalDate scheduled_date;
-    private LocalDateTime created_at;
+    private LocalDate scheduledDate;
+    private LocalDateTime createdAt;
 
     @ManyToOne
     @JoinColumn(name = "userId", nullable = false)
@@ -40,7 +40,7 @@ public class Workout {
 
     @PrePersist
     protected void onCreate() {
-        created_at = LocalDateTime.now();
+        createdAt = LocalDateTime.now();
     }
 
     private Boolean completed; // Add this field

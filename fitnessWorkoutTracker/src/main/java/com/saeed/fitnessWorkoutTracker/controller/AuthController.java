@@ -1,5 +1,6 @@
 package com.saeed.fitnessWorkoutTracker.controller;
 
+import com.saeed.fitnessWorkoutTracker.exception.ApiResponse;
 import com.saeed.fitnessWorkoutTracker.model.User;
 import com.saeed.fitnessWorkoutTracker.repository.UserRepository;
 import com.saeed.fitnessWorkoutTracker.security.jwt.JwtUtils;
@@ -16,25 +17,25 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
     @Autowired
-     JwtUtils jwtUtils;
+    JwtUtils jwtUtils;
 
     @Autowired
-     AuthenticationManager authenticationManager;
+    AuthenticationManager authenticationManager;
 
     @Autowired
     UserRepository userRepository;
@@ -91,4 +92,7 @@ public class AuthController {
         userRepository.save(user);
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
+
+
+
 }

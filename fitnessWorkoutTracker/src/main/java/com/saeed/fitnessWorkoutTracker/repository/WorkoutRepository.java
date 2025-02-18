@@ -9,6 +9,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 public interface WorkoutRepository extends JpaRepository<Workout, Long> {
@@ -19,4 +22,8 @@ public interface WorkoutRepository extends JpaRepository<Workout, Long> {
     Page<Workout> findByUser(User user, Pageable pageDetails);
 
     List<Workout> findByUser_UserId(Long userId);
+
+    Arrays findByCreatedAt(LocalDate createdAt);
+
+    Arrays findByCreatedAtBetween(LocalDateTime startOfDay, LocalDateTime endOfDay);
 }

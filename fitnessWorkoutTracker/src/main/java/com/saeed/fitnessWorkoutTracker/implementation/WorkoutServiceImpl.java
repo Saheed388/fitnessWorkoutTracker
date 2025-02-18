@@ -17,7 +17,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.util.Arrays.stream;
 
 @Service
 public class WorkoutServiceImpl implements WorkoutService {
@@ -107,7 +113,7 @@ public class WorkoutServiceImpl implements WorkoutService {
         }
         // Update only allowed fields
         savedWorkout.setTitle(workoutDTO.getTitle());
-        savedWorkout.setScheduled_date(workoutDTO.getScheduled_date());
+        savedWorkout.setScheduledDate(workoutDTO.getScheduledDate());
         // Save and return updated workout
         Workout updatedWorkout = workoutRepository.save(savedWorkout);
         WorkoutDTO updatedWorkoutDTO = modelMapper.map(updatedWorkout, WorkoutDTO.class);
@@ -129,6 +135,7 @@ public class WorkoutServiceImpl implements WorkoutService {
         return modelMapper.map(deletedWorkout, WorkoutDTO.class);
 
     }
+
 
 }
 
