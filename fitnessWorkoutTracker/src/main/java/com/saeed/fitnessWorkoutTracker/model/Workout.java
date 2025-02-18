@@ -29,7 +29,7 @@ public class Workout {
     private LocalDateTime created_at;
 
     @ManyToOne
-    @JoinColumn(name = "userId", nullable = false) // ✅ Proper foreign key mapping
+    @JoinColumn(name = "userId", nullable = false)
     private User user;
 
     @OneToMany(mappedBy = "workout", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
@@ -41,5 +41,12 @@ public class Workout {
     @PrePersist
     protected void onCreate() {
         created_at = LocalDateTime.now();
+    }
+
+    private Boolean completed; // Add this field
+
+    public boolean isCompleted() {
+        return  completed;
+
     }
 }

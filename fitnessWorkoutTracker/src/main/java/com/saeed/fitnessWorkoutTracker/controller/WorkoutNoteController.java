@@ -99,7 +99,7 @@ public class WorkoutNoteController {
     }
     @PutMapping("/workoutnote/{workoutNoteId}")
     public ResponseEntity<ApiResponse<WorkoutNoteDTO>> updateWorkoutNote(@Valid @RequestBody WorkoutNoteDTO workoutNoteDTO,
-                                                                   @PathVariable Long workoutNoteId,
+                                                                         @PathVariable Long workoutNoteId,
                                                                          @RequestHeader("Authorization") String token) {
         if (token   == null || !token.startsWith("Bearer ")){
             throw new APIException("Invalid or missing Authorization token");

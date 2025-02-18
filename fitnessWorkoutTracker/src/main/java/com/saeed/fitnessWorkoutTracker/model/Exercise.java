@@ -27,7 +27,7 @@ public class Exercise {
 
     private Long setsExercises;
     private Long exercisesRepetitions;
-    private Boolean completed;
+//    private Boolean completed;
     private LocalDateTime createdAt;
 
     @PrePersist
@@ -39,10 +39,15 @@ public class Exercise {
     @JoinColumn(name = "workout_id")
     private Workout workout;
 
-    @ManyToOne // Each exercise belongs to one user
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false) // Ensure correct foreign key
     private User user;
 
+    private Boolean completed; // Add this field
 
+
+    public boolean isCompleted() {
+        return  completed;
+    }
 }
 

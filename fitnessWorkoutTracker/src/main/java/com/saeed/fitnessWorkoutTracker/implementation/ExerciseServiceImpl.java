@@ -166,7 +166,6 @@ public class ExerciseServiceImpl implements ExerciseService {
         exerciseFromDb.setSetsExercises(exerciseDTO.getSetsExercises());
         exerciseFromDb.setExercisesRepetitions(exerciseDTO.getExercisesRepetitions());
         exerciseFromDb.setCompleted(exerciseDTO.getCompleted());
-        exerciseFromDb.setCreatedAt(exerciseDTO.getCreatedAt());
         Exercise savedExercise = exerciseRepository.save(exerciseFromDb);
         return new ApiResponse<>("Updated Successfully",HttpStatus.OK.value(), modelMapper.map(savedExercise, ExerciseDTO.class)).getData();
     }

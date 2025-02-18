@@ -52,7 +52,7 @@ public class User {
 
     @OneToMany(mappedBy = "user",
             cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    private List<Exercise> exercises = new ArrayList<>();
+    private List<Exercise> exercises;
 
     // Many-to-Many Relationship for Roles
     @ManyToMany(fetch = FetchType.EAGER)

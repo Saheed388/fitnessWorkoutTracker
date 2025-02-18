@@ -15,5 +15,7 @@ public class WorkoutDTO {
     private String title;
     private LocalDate scheduled_date;
     private LocalDateTime created_at;
-    private Long userId; // ✅ Store only user ID
+    private Long userId;
+    private Boolean completed;
+
 }

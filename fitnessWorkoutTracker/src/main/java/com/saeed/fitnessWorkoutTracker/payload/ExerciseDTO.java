@@ -4,18 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-
+@AllArgsConstructor  // Ensure constructor exists
+@NoArgsConstructor  // Ensure empty constructor exists (JPA might need it)
 public class ExerciseDTO {
     private Long exerciseId;
     private String exerciseName;
-    private Long setsExercises;
     private Long exercisesRepetitions;
+    private Long setsExercises;
     private Boolean completed;
-    private LocalDateTime createdAt;
 }
