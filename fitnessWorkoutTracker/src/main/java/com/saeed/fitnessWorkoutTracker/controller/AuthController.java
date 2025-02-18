@@ -44,7 +44,7 @@ public class AuthController {
     PasswordEncoder encoder;
 
     @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<ApiResponse<?>> authenticateUser(@RequestBody LoginRequest loginRequest) {
         Authentication authentication;
         try {
             authentication = authenticationManager
@@ -53,7 +53,8 @@ public class AuthController {
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Bad credentials");
             response.put("status", false);
-            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(new ApiResponse<>("Access denied",HttpStatus.OK.value(), response), HttpStatus.UNAUTHORIZED);
+
         }
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -70,18 +71,23 @@ public class AuthController {
         response.put("username", userDetails.getUsername());
         response.put("role", role);
 
-        return ResponseEntity.ok(response);
+        return new ResponseEntity<>(new ApiResponse<>(" Login Successfully ",HttpStatus.OK.value(), response), HttpStatus.OK);
+
     }
 
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+    public ResponseEntity<ApiResponse<?>> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
         if (userRepository.existsByUserName(signUpRequest.getUsername())) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
+            return ResponseEntity.badRequest().body(new ApiResponse<>("Error: Username is already taken!",HttpStatus.OK.value(), HttpStatus.OK));
+
         }
 
+
+
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
+            return ResponseEntity.badRequest().body(new ApiResponse<>("Error: Email is already in use!",HttpStatus.OK.value(), HttpStatus.OK));
+
         }
 
         // Create new user's account
@@ -90,7 +96,9 @@ public class AuthController {
                 encoder.encode(signUpRequest.getPassword()));
 
         userRepository.save(user);
-        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+        return ResponseEntity.badRequest().body(new ApiResponse<>("User registered successfully!",HttpStatus.OK.value(), HttpStatus.OK));
+
+
     }
 
 

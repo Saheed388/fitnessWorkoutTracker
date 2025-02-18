@@ -1,8 +1,10 @@
 package com.saeed.fitnessWorkoutTracker.controller;
 
+import com.saeed.fitnessWorkoutTracker.exception.ApiResponse;
 import com.saeed.fitnessWorkoutTracker.payload.WorkoutReportDTO;
 import com.saeed.fitnessWorkoutTracker.service.WorkoutReportService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,20 +19,22 @@ public class WorkoutReportController {
     private WorkoutReportService workoutReportService;
 
     @PostMapping("/workout-reports/generate/{userId}")
-    public ResponseEntity<WorkoutReportDTO> generateWorkoutReport(@PathVariable Long userId) {
+    public ResponseEntity<ApiResponse<WorkoutReportDTO>> generateWorkoutReport(@PathVariable Long userId) {
         WorkoutReportDTO report = workoutReportService.generateWorkoutReport(userId);
-        return ResponseEntity.ok(report);
+        return new ResponseEntity<>(new ApiResponse<>("Report Generated Successfully",HttpStatus.OK.value(), report), HttpStatus.OK);
+
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<WorkoutReportDTO>> getWorkoutReportsByUser(@PathVariable Long userId) {
+    public ResponseEntity<ApiResponse<List<WorkoutReportDTO>>> getWorkoutReportsByUser(@PathVariable Long userId) {
         List<WorkoutReportDTO> reports = workoutReportService.getWorkoutReportsByUser(userId);
-        return ResponseEntity.ok(reports);
+        return new ResponseEntity<>(new ApiResponse<>("User Generated Successfully",HttpStatus.OK.value(), reports), HttpStatus.OK);
     }
 
     @GetMapping("/workout-reports/date")
-    public ResponseEntity<List<WorkoutReportDTO>> getWorkoutReportsByDate(@RequestParam LocalDate date) {
+    public ResponseEntity<ApiResponse<List<WorkoutReportDTO>>> getWorkoutReportsByDate(@RequestParam LocalDate date) {
         List<WorkoutReportDTO> reports = workoutReportService.getWorkoutReportsByDate(date);
-        return ResponseEntity.ok(reports);
+        return new ResponseEntity<>(new ApiResponse<>("User Generated Successfully",HttpStatus.OK.value(), reports), HttpStatus.OK);
     }
 }
+
