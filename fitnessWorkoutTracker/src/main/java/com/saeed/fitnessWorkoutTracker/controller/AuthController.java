@@ -83,14 +83,10 @@ public class AuthController {
 
         }
 
-
-
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
             return ResponseEntity.badRequest().body(new ApiResponse<>("Error: Email is already in use!",HttpStatus.OK.value(), HttpStatus.OK));
 
         }
-
-        // Create new user's account
         User user = new User(signUpRequest.getUsername(),
                 signUpRequest.getEmail(),
                 encoder.encode(signUpRequest.getPassword()));
@@ -100,6 +96,15 @@ public class AuthController {
 
 
     }
+    @GetMapping("/username")
+    public String currecntUserName(Authentication authentication) {
+        if(authentication != null) {
+            return authentication.getName();
+        } else {
+            return " ";
+        }
+    }
+
 
 
 
