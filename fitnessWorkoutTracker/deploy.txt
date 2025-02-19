@@ -1,0 +1,9 @@
+fitnessWorkoutTracker
+
+docker login
+
+docker build -t saheed338/fitnessapp:latest .
+
+docker push saheed338/fitnessapp:latest
+
+

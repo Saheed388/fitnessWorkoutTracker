@@ -34,7 +34,7 @@ public class WorkoutReportController {
     @GetMapping("/workout-reports/date")
     public ResponseEntity<ApiResponse<List<WorkoutReportDTO>>> getWorkoutReportsByDate(@RequestParam LocalDate date) {
         List<WorkoutReportDTO> reports = workoutReportService.getWorkoutReportsByDate(date);
-        return new ResponseEntity<>(new ApiResponse<>("User Generated Successfully",HttpStatus.OK.value(), reports), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse<>("Date Generated Successfully",HttpStatus.OK.value(), reports), HttpStatus.OK);
     }
 }
 
